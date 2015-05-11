@@ -1,2 +1,2 @@
 # AxeChat
-Irc client written in C# using some frienly library :)
+Irc client written in C# using some friendly library :)
