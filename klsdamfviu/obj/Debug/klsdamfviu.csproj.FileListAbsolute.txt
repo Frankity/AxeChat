@@ -10,3 +10,4 @@ C:\Users\Sistemas KOBALTO\Documents\SharpDevelop Projects\klsdamfviu\klsdamfviu\
 C:\Users\Sistemas KOBALTO\Documents\SharpDevelop Projects\klsdamfviu\klsdamfviu\bin\Debug\AxeChat.pdb
 C:\Users\Sistemas KOBALTO\Documents\SharpDevelop Projects\klsdamfviu\klsdamfviu\obj\Debug\AxeChat.exe
 C:\Users\Sistemas KOBALTO\Documents\SharpDevelop Projects\klsdamfviu\klsdamfviu\obj\Debug\AxeChat.pdb
+C:\Users\Sistemas KOBALTO\Documents\SharpDevelop Projects\klsdamfviu\klsdamfviu\bin\Debug\ScintillaNET.xml

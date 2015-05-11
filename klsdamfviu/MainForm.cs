@@ -20,8 +20,8 @@ namespace klsdamfviu
         IdentListener L = new IdentListener(nick);
         xmlDocs xl = new xmlDocs();
 
-
-        public RichTextBox newrtb = new RichTextBox();
+       // public RichTextBox newrtb = new RichTextBox();
+        public ScintillaNET.Scintilla newrtb = new ScintillaNET.Scintilla();
 
         public MainForm()
         {
@@ -35,30 +35,62 @@ namespace klsdamfviu
         void MainFormLoad(object sender, EventArgs e)
         {
 
-            irClient = new IrcBot(xl.MainNick, xl.LastChan.ToString());
+            irClient = new IrcBot(xl.MainNick);
             irClient.OnConnectEvent += irc_OnConnectEvent;
             irClient.OnMotdEvent += irc_OnMotEvent;
-            irClient.OnJoinChannelEvent += irc_OnJoinChannelEvent;
+            
+            
+            //irClient.OnJoinChannelEvent +=irClient_OnJoinChannelEvent;
             irClient.OnChannelMessageEvent += irc_OnChannelMessageEvent;
             irClient.OnChannelMessageEvent +=irClient_OnChannelMessageEvent;
             irClient.OnQueryMessageEvent +=irClient_OnQueryMessageEvent;
             irClient.OnCtcpResponseEvent += irClient_OnCtcpResponseEvent;
             irClient.OnNamereplyEvent += irClient_OnNamereplyEvent;
-            irClient.OnPartChannelEvent += irClient_OnPartChannelEvent;
+            irClient.OnPartChannelEvent +=  irClient_OnPartChannelEvent;
             irClient.OnTopicMessageEvent +=irClient_OnTopicMessageEvent;
             irClient.OnNoticeEvent+=irClient_OnNoticeEvent;
             irClient.OnTopicChangedMessageEvent+=irClient_OnTopicChangedMessageEvent;
             irClient.OnNickChangeEvent +=irClient_OnNickChangeEvent;
+            irClient.OnJoinChannelEvent += irClient_OnJoinChannelEvent;
+            irClient.OnActionEvent += irClient_OnActionEvent;
             
-            this.button2.Text = xl.MainNick;
-           
 
-            if (xl.Version != "") { irClient.VersionMessage.ToString(); }
+            this.button2.Text = xl.MainNick;
+
+            if (xl.Version != "") { irClient.VersionMessage = xl.Version ; }
             else
             {
-                //(this.Text + " v. 16.27.49 [" + System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") + "] using RobbingHood Library.");
+                irClient.VersionMessage = "AxeChat v. 11.5.15 [" + System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") + "] using RobbingHood Library.";
             }
-          irClient.Connect(xl.Server, 6660,true);
+            List<string> ch = new List<string>();
+            ch.Add("#dahouse");
+          
+
+          irClient.Connect(xl.Server, 6660,true,ch);
+        }
+
+        private void irClient_OnActionEvent(string channel, string user, string message)
+        {
+            newrtb.Text += message.ToString();
+        }
+
+        private void irClient_OnJoinChannelEvent(string channel, string user)
+        {
+           newrtb.Text += "Notice: " + user + " has joined on " + channel + "\r\n";
+           updatelist();
+        }
+
+        private void irClient_OnPartChannelEvent(string channel, string user, string message)
+        {
+          //  irClient.Send(xl.LastChan, irClient.QuitMessage.ToString());
+            //newrtb.Text += xl.MainNick + ": " + irClient.QuitMessage.ToString() + "\r\n";
+            newrtb.Text += "Notice: " + user + " has quit" + "\r\n";
+            updatelist();
+        }
+
+        public void updatelist()
+        {
+            irClient.SendRaw("NAMES " + xl.LastChan);
         }
 
         private void irClient_OnNickChangeEvent(string oldNick, string newNick)
@@ -68,14 +100,14 @@ namespace klsdamfviu
 
         private void irClient_OnTopicChangedMessageEvent(string changedBy, string channel, string topic)
         {
-            Font f = new Font("Consolas",9.0f,FontStyle.Bold);
+       /*     Font f = new Font("Consolas",9.0f,FontStyle.Bold);
             int str = newrtb.Find(changedBy);
             if (str > 0)
 	            {
                     newrtb.Select(str,changedBy.Length);
                     newrtb.SelectionFont = new System.Drawing.Font(newrtb.Font, FontStyle.Bold);
                 }
-            newrtb.Text += changedBy + " has changed the topic to: " + topic + "\r\n";
+            newrtb.Text += changedBy + " has changed the topic to: " + topic + "\r\n";*/
         }
 
         private void irClient_OnNoticeEvent(IrcMessage m)
@@ -89,16 +121,14 @@ namespace klsdamfviu
             textBox2.Text += topic;
         }
 
-        private void irClient_OnPartChannelEvent(string channel)
-        {
-            irClient.Send(xl.LastChan, irClient.QuitMessage.ToString());
-            newrtb.Text += xl.MainNick + ": " + irClient.QuitMessage.ToString() + "\r\n";
-        }
-
         private void irClient_OnNamereplyEvent(string channel, string[] users)
         {
+            listView1.Clear();
             for (int i = 0; i < users.Length; i++)
             {
+                IList<ScintillaNET.Range> r = newrtb.FindReplace.FindAll(i.ToString());
+                //newrtb.FindReplace.FindAll(i.ToString());
+                newrtb.FindReplace.HighlightAll(r);
                 listView1.Items.Add(users[i]);
             }
         }
@@ -152,24 +182,19 @@ namespace klsdamfviu
             tabControl1.SelectedTab = newchan;
             tabControl1.TabPages.Add(newchan);
 
+            newrtb.Enabled = false;
             Font ft = new Font("Consolas", 9.0f);
             newrtb.Font = ft;
             newrtb.Dock = DockStyle.Fill;
-            newrtb.ReadOnly = true;
+            
             newchan.Controls.Add(newrtb);
             newrtb.TextChanged +=newrtb_TextChanged;
         }
 
         private void newrtb_TextChanged(object sender, EventArgs e)
         {
-            RichTextBox bold = newrtb;
-            foreach (string line in bold.Lines)
-            {
-                string name = line.Split(' ')[0];
-                int srt = bold.Find(name);
-                bold.Select(srt+1, name.Length);
-                bold.SelectionFont = new Font(bold.Font, FontStyle.Bold);
-            } 
+         //   ScintillaNET.Scintilla bold = newrtb;
+         
         }
 
         private void irc_OnJoinChannelEvent(string chann)
@@ -209,14 +234,14 @@ namespace klsdamfviu
                 if (textBox1.Text.StartsWith("//"))
                 {
                     irClient.SendRaw("/" + textBox1.Text);
-                    newrtb.Text += xl.MainNick + ": " + textBox1.Text + "\r\n";
+                    newrtb.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
                     textBox1.Clear();
                     textBox1.Focus();
                 }
                 else
                 {
                     irClient.Send(xl.LastChan, textBox1.Text);
-                    newrtb.Text += xl.MainNick + ": " + textBox1.Text + "\r\n";
+                    newrtb.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
                     textBox1.Clear();
                     textBox1.Focus();
                 }

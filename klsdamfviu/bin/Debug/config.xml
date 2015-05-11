@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<apversion>Urmom 1.2</apversion>
+	<apversion></apversion>
 	<server>irc.uworld.se</server>
 	<nick>DerpFace</nick>
 	<lastchan>#dahouse</lastchan>
