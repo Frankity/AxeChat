@@ -16,8 +16,6 @@ namespace klsdamfviu
         public nickForm()
         {
             InitializeComponent();
-            
         }
-
    }
 }

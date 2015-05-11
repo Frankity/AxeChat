@@ -13,6 +13,8 @@ namespace klsdamfviu
 
     public partial class MainForm : Form
     {
+        int createdTab = 0;
+
 
         public IrcBot irClient;
         public static string nick = connForm.MainNick;
@@ -25,6 +27,7 @@ namespace klsdamfviu
 
         public MainForm()
         {
+            IsMdiContainer = true;
             //L.Listen();
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
@@ -88,6 +91,23 @@ namespace klsdamfviu
             updatelist();
         }
 
+        public void AddNewChan(string chann)
+        {
+            
+            liteForm newchild = new liteForm();
+            TabPage childtab = new TabPage();
+            newchild.MdiParent = this;
+            newchild.Name = "child " + createdTab.ToString();
+            newchild.Text = " child no " + createdTab.ToString();
+            childtab.Name = newchild.Name;
+            childtab.Text = newchild.Text;
+            tabControl1.TabPages.Add(childtab);
+            newchild.scs.Parent = childtab;
+
+            newchild.Show();
+            createdTab++;
+        }
+
         public void updatelist()
         {
             irClient.SendRaw("NAMES " + xl.LastChan);
@@ -118,7 +138,7 @@ namespace klsdamfviu
         private void irClient_OnTopicMessageEvent(string channel, string topic)
         {
             newrtb.Text += "The topic for: " + channel + " is " + topic + "\n";
-            textBox2.Text += topic;
+            textBox2.Text += topic; 
         }
 
         private void irClient_OnNamereplyEvent(string channel, string[] users)
@@ -212,7 +232,8 @@ namespace klsdamfviu
 
         private void nuevoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            maketab(xl.LastChan);
+            AddNewChan(xl.LastChan);
+            //maketab(xl.LastChan);
         }
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)

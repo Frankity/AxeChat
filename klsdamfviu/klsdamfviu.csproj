@@ -88,6 +88,12 @@
     <Compile Include="connForm.Designer.cs">
       <DependentUpon>connForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="liteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="liteForm.Designer.cs">
+      <DependentUpon>liteForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -110,6 +116,9 @@
   <ItemGroup>
     <EmbeddedResource Include="connForm.resx">
       <DependentUpon>connForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="liteForm.resx">
+      <DependentUpon>liteForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
