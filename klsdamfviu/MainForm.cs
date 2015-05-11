@@ -58,7 +58,7 @@ namespace klsdamfviu
                 irClient.VersionMessage = "AxeChat v. 11.5.15 [" + System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE") + "] using RobbingHood Library.";
             }
             List<string> ch = new List<string>();
-            ch.Add("#dahouse");
+            ch.Add(xl.LastChan);
           
 
           irClient.Connect(xl.Server, 6660,true,ch);
@@ -93,7 +93,7 @@ namespace klsdamfviu
             childtab.Text = newchild.Text;
             tabControl1.TabPages.Add(childtab);
             newchild.scs.Parent = childtab;
-
+            
             newchild.Show();
             createdTab++;
         }
@@ -136,11 +136,16 @@ namespace klsdamfviu
             listView1.Clear();
             for (int i = 0; i < users.Length; i++)
             {
-                IList<ScintillaNET.Range> r = newrtb.FindReplace.FindAll(i.ToString());
-                //newrtb.FindReplace.FindAll(i.ToString());
-                newchild.scs.FindReplace.HighlightAll(r);
+             
                 listView1.Items.Add(users[i]);
+                if (users[i].StartsWith("&"))
+                {
+                    listView1.Items[0].ImageIndex = 0;    
+                }
+
             }
+
+            toolStripStatusLabel2.Text = users.Length.ToString();
         }
 
         private void irClient_OnNamereplyEvent(IrcMessage m)
@@ -160,7 +165,12 @@ namespace klsdamfviu
 
         private void irClient_OnChannelMessageEvent(IrcMessage m)
         {
-            infortb.Text += m.Message.ToString() + "\r\n";
+            if (m.Message.StartsWith(":")) 
+            {
+                m.Message.Replace(":",":");
+            }else{
+               infortb.Text += m.Message.ToString() + "\r\n";
+            }
         }
         
         private void irc_OnChannelMessageEvent(IrcMessage m)
@@ -220,12 +230,15 @@ namespace klsdamfviu
             System.Environment.Exit(1);
         }
 
+        void chanjoin(string channame)
+        {
+            irClient.JoinChannel(channame);
+            AddNewChan(channame);
+        }
+
         private void nuevoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            irClient.JoinChannel(textBox3.Text);
-            AddNewChan(textBox3.Text);
-            
-            //maketab(xl.LastChan);
+            chanjoin(textBox3.Text);   
         }
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
