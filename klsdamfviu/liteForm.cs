@@ -13,6 +13,8 @@ namespace klsdamfviu
 {
     public partial class liteForm : Form
     {
+        public ScintillaNET.Scintilla scs = new ScintillaNET.Scintilla();
+
         public liteForm()
         {
             InitializeComponent();
@@ -20,12 +22,9 @@ namespace klsdamfviu
             Font ft = new Font("Consolas", 9.0f);
             scs.Font = ft;
             scs.Dock = DockStyle.Fill;
-
             this.Controls.Add(scs);
-            //scs.TextChanged += newrtb_TextChanged;
+            //scs.Click += scs_click();
         }
-
-        public ScintillaNET.Scintilla scs = new ScintillaNET.Scintilla();
 
     }
 }

@@ -14,16 +14,12 @@ namespace klsdamfviu
     public partial class MainForm : Form
     {
         int createdTab = 0;
-
-
         public IrcBot irClient;
         public static string nick = connForm.MainNick;
-      
         IdentListener L = new IdentListener(nick);
         xmlDocs xl = new xmlDocs();
-
-       // public RichTextBox newrtb = new RichTextBox();
         public ScintillaNET.Scintilla newrtb = new ScintillaNET.Scintilla();
+        liteForm newchild = new liteForm();
 
         public MainForm()
         {
@@ -41,9 +37,6 @@ namespace klsdamfviu
             irClient = new IrcBot(xl.MainNick);
             irClient.OnConnectEvent += irc_OnConnectEvent;
             irClient.OnMotdEvent += irc_OnMotEvent;
-            
-            
-            //irClient.OnJoinChannelEvent +=irClient_OnJoinChannelEvent;
             irClient.OnChannelMessageEvent += irc_OnChannelMessageEvent;
             irClient.OnChannelMessageEvent +=irClient_OnChannelMessageEvent;
             irClient.OnQueryMessageEvent +=irClient_OnQueryMessageEvent;
@@ -57,7 +50,6 @@ namespace klsdamfviu
             irClient.OnJoinChannelEvent += irClient_OnJoinChannelEvent;
             irClient.OnActionEvent += irClient_OnActionEvent;
             
-
             this.button2.Text = xl.MainNick;
 
             if (xl.Version != "") { irClient.VersionMessage = xl.Version ; }
@@ -74,12 +66,12 @@ namespace klsdamfviu
 
         private void irClient_OnActionEvent(string channel, string user, string message)
         {
-            newrtb.Text += message.ToString();
+            newchild.scs.Text += message.ToString();
         }
 
         private void irClient_OnJoinChannelEvent(string channel, string user)
         {
-           newrtb.Text += "Notice: " + user + " has joined on " + channel + "\r\n";
+           newchild.scs.Text += "Notice: " + user + " has joined on " + channel + "\r\n";
            updatelist();
         }
 
@@ -87,18 +79,16 @@ namespace klsdamfviu
         {
           //  irClient.Send(xl.LastChan, irClient.QuitMessage.ToString());
             //newrtb.Text += xl.MainNick + ": " + irClient.QuitMessage.ToString() + "\r\n";
-            newrtb.Text += "Notice: " + user + " has quit" + "\r\n";
+            newchild.scs.Text += "Notice: " + user + " has quit" + "\r\n";
             updatelist();
         }
 
         public void AddNewChan(string chann)
         {
-            
-            liteForm newchild = new liteForm();
             TabPage childtab = new TabPage();
             newchild.MdiParent = this;
-            newchild.Name = "child " + createdTab.ToString();
-            newchild.Text = " child no " + createdTab.ToString();
+            newchild.Name = "page" + createdTab.ToString();
+            newchild.Text = chann;
             childtab.Name = newchild.Name;
             childtab.Text = newchild.Text;
             tabControl1.TabPages.Add(childtab);
@@ -110,12 +100,12 @@ namespace klsdamfviu
 
         public void updatelist()
         {
-            irClient.SendRaw("NAMES " + xl.LastChan);
+            irClient.SendRaw("NAMES " + tabControl1.SelectedTab.Text);
         }
 
         private void irClient_OnNickChangeEvent(string oldNick, string newNick)
         {
-            newrtb.Text += "Notice: " + oldNick + " has changed his nick to " + newNick + "\r\n";
+            newchild.scs.Text += "Notice: " + oldNick + " has changed his nick to " + newNick + "\r\n";
         }
 
         private void irClient_OnTopicChangedMessageEvent(string changedBy, string channel, string topic)
@@ -137,7 +127,7 @@ namespace klsdamfviu
 
         private void irClient_OnTopicMessageEvent(string channel, string topic)
         {
-            newrtb.Text += "The topic for: " + channel + " is " + topic + "\n";
+            newchild.scs.Text += "The topic for: " + channel + " is " + topic + "\n";
             textBox2.Text += topic; 
         }
 
@@ -148,19 +138,19 @@ namespace klsdamfviu
             {
                 IList<ScintillaNET.Range> r = newrtb.FindReplace.FindAll(i.ToString());
                 //newrtb.FindReplace.FindAll(i.ToString());
-                newrtb.FindReplace.HighlightAll(r);
+                newchild.scs.FindReplace.HighlightAll(r);
                 listView1.Items.Add(users[i]);
             }
         }
 
         private void irClient_OnNamereplyEvent(IrcMessage m)
         {
-            newrtb.Text += m.Message.ToString() + "\r\n";
+             newchild.scs.Text += m.Message.ToString() + "\r\n";
         }
         
         void irClient_OnCtcpResponseEvent(string sender, string command)
         {
-            newrtb.Text += sender + " " + command;
+            newchild.scs.Text += sender + " " + command;
         }
 
         private void irClient_OnQueryMessageEvent(IrcMessage m)
@@ -175,16 +165,16 @@ namespace klsdamfviu
         
         private void irc_OnChannelMessageEvent(IrcMessage m)
         {
-            if (newrtb.InvokeRequired)
+            if (newchild.scs.InvokeRequired)
             {
-                newrtb.Text += m.SenderName.ToString() + ": " + m.Message.ToString() + Environment.NewLine;
+                newchild.scs.Text += m.SenderName.ToString() + ": " + m.Message.ToString() + Environment.NewLine;
             }
         }
 
         private void irc_OnConnectEvent()
         {
             infortb.Text += "Connected\n";
-            maketab(xl.LastChan.ToString());
+            AddNewChan(xl.LastChan.ToString());
         }
 
         private void irc_OnMotEvent(IrcMessage m)
@@ -195,7 +185,7 @@ namespace klsdamfviu
             }
         }
 
-        public void maketab(string name)
+       /* public void maketab(string name)
         {
             TabPage newchan = new TabPage(name);
             newchan.Name = name;
@@ -209,13 +199,13 @@ namespace klsdamfviu
             
             newchan.Controls.Add(newrtb);
             newrtb.TextChanged +=newrtb_TextChanged;
-        }
+        }*/
 
-        private void newrtb_TextChanged(object sender, EventArgs e)
+        /*private void newrtb_TextChanged(object sender, EventArgs e)
         {
          //   ScintillaNET.Scintilla bold = newrtb;
          
-        }
+        }*/
 
         private void irc_OnJoinChannelEvent(string chann)
         {
@@ -232,7 +222,9 @@ namespace klsdamfviu
 
         private void nuevoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AddNewChan(xl.LastChan);
+            irClient.JoinChannel(textBox3.Text);
+            AddNewChan(textBox3.Text);
+            
             //maketab(xl.LastChan);
         }
 
@@ -243,9 +235,9 @@ namespace klsdamfviu
 
         private void button1_Click(object sender, EventArgs e)
         {
-            textBox1.Clear();
-            textBox1.Focus();
-            irClient.SendCtcpRequest(button2.Text, "NAMES ");
+
+            irClient.JoinChannel(textBox3.Text);
+
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -255,14 +247,14 @@ namespace klsdamfviu
                 if (textBox1.Text.StartsWith("//"))
                 {
                     irClient.SendRaw("/" + textBox1.Text);
-                    newrtb.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
+                    newchild.scs.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
                     textBox1.Clear();
                     textBox1.Focus();
                 }
                 else
                 {
-                    irClient.Send(xl.LastChan, textBox1.Text);
-                    newrtb.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
+                    irClient.Send(tabControl1.SelectedTab.Text, textBox1.Text);
+                    newchild.scs.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
                     textBox1.Clear();
                     textBox1.Focus();
                 }
@@ -291,6 +283,18 @@ namespace klsdamfviu
             }
 
         }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            updatelist();
+        }
+
+        private void tabControl1_MouseClick(object sender, MouseEventArgs e)
+        {
+            MessageBox.Show(tabControl1.SelectedTab.Name);
+        }
+
+      
 
     }
 }
