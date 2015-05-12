@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace klsdamfviu.MotorScript
 {
-    public static class Global
+    class LoadPlugin
     {
-        public static bool PrintEvents = true;
-        public static bool PrintEventUpdates = false;
     }
 }

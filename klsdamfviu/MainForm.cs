@@ -17,6 +17,7 @@ namespace klsdamfviu
 
     public partial class MainForm : Form
     {
+        
         int createdTab = 0;
         public IrcBot irClient;
         public static string nick = connForm.MainNick;
@@ -25,21 +26,11 @@ namespace klsdamfviu
         liteForm newchild = new liteForm();
 
         //----------------------plugins-----------------------//
-
-        public static ScriptHandler Scripting;
-        public static ScriptManager ScrMngr;
+       
 
         public MainForm()
         {
-            Scripting = new JsMotorScript();
-            ScrMngr = new ScriptManager();
-            ScrMngr.ScriptHandlers.Add(Scripting);
-            ScrMngr.Initialize();
-
-            Scripting.Run();
-
-            var iniArgs = ScrMngr.CallEvent<InitializeEvents>("OnInitialize", new InitializeEvents());
-
+            
             IsMdiContainer = true;
             //L.Listen();
             InitializeComponent();
@@ -88,7 +79,7 @@ namespace klsdamfviu
         private void irClient_OnJoinChannelEvent(string channel, string user)
         {
            //newchild.scs.Text += "Notice: " + user + " has joined on " + channel + "\r\n";
-           updatelist();
+            updatelist();
         }
 
         private void irClient_OnPartChannelEvent(string channel, string user, string message)
@@ -300,6 +291,7 @@ namespace klsdamfviu
             if (e.KeyChar == (char)Keys.Return)
             {
                 Console.WriteLine(textBox1.Text);
+                
                     irClient.Send(tabControl1.SelectedTab.Text, textBox1.Text);
                     newchild.scs.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
                     textBox1.Clear();
@@ -330,8 +322,6 @@ namespace klsdamfviu
 
         }
 
-       
-
         private void tabControl1_MouseClick(object sender, MouseEventArgs e)
         {
             //MessageBox.Show(tabControl1.SelectedTab.Name);
@@ -356,5 +346,6 @@ namespace klsdamfviu
         {
             updatelist();
         }
+      
     }
 }
