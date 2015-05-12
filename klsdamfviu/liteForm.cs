@@ -7,24 +7,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ICSharpCode.TextEditor;
 
 
 namespace klsdamfviu
 {
     public partial class liteForm : Form
     {
-        public ScintillaNET.Scintilla scs = new ScintillaNET.Scintilla();
+        public ICSharpCode.TextEditor.TextEditorControl scs = new TextEditorControl();
 
         public liteForm()
         {
             InitializeComponent();
-            scs.Enabled = false;
+            scs.IsReadOnly = true;
             Font ft = new Font("Consolas", 9.0f);
             scs.Font = ft;
             scs.Dock = DockStyle.Fill;
+            scs.HideMouseCursor = true;
             this.Controls.Add(scs);
-            //scs.Click += scs_click();
+            
+        
         }
+
 
     }
 }

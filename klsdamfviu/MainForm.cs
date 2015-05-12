@@ -18,7 +18,6 @@ namespace klsdamfviu
         public static string nick = connForm.MainNick;
         IdentListener L = new IdentListener(nick);
         xmlDocs xl = new xmlDocs();
-        public ScintillaNET.Scintilla newrtb = new ScintillaNET.Scintilla();
         liteForm newchild = new liteForm();
 
         public MainForm()
@@ -28,11 +27,12 @@ namespace klsdamfviu
             InitializeComponent();
             Control.CheckForIllegalCrossThreadCalls = false;
             xl.loadXMl(AppDomain.CurrentDomain.BaseDirectory + @"\config.xml");
-            MessageBox.Show(xl.LastChan);
-        }
+            //  MessageBox.Show(xl.LastChan);
 
+        }
         void MainFormLoad(object sender, EventArgs e)
         {
+            Console.WriteLine("working");
 
             irClient = new IrcBot(xl.MainNick);
             irClient.OnConnectEvent += irc_OnConnectEvent;
@@ -66,20 +66,18 @@ namespace klsdamfviu
 
         private void irClient_OnActionEvent(string channel, string user, string message)
         {
-            newchild.scs.Text += message.ToString();
+           newchild.scs.Text += message.ToString();
         }
 
         private void irClient_OnJoinChannelEvent(string channel, string user)
         {
-           newchild.scs.Text += "Notice: " + user + " has joined on " + channel + "\r\n";
+           //newchild.scs.Text += "Notice: " + user + " has joined on " + channel + "\r\n";
            updatelist();
         }
 
         private void irClient_OnPartChannelEvent(string channel, string user, string message)
         {
-          //  irClient.Send(xl.LastChan, irClient.QuitMessage.ToString());
-            //newrtb.Text += xl.MainNick + ": " + irClient.QuitMessage.ToString() + "\r\n";
-            newchild.scs.Text += "Notice: " + user + " has quit" + "\r\n";
+           newchild.scs.Text += "Notice: " + user + " has quit" + "\r\n";
             updatelist();
         }
 
@@ -93,9 +91,34 @@ namespace klsdamfviu
             childtab.Text = newchild.Text;
             tabControl1.TabPages.Add(childtab);
             newchild.scs.Parent = childtab;
-            
+            ToolStripMenuItem menutab = new ToolStripMenuItem();
+            menutab.Text = newchild.Text;
+            menutab.Name = newchild.Name;
+            herramientasToolStripMenuItem.DropDownItems.Add(menutab);
+            menutab.Click += new EventHandler(menutab_Click);
+            tabControl1.SelectTab(childtab);
             newchild.Show();
             createdTab++;
+        }
+
+        private void menutab_Click(object sender, EventArgs e)
+        {
+         //   throw new NotImplementedException();
+            foreach (TabPage theTab in tabControl1.TabPages)
+            {
+                if (theTab.Text == sender.ToString())
+                {
+                    tabControl1.SelectTab(theTab);
+                    foreach (Form WantToSelect in this.MdiChildren)
+                    {
+                        if (WantToSelect.Name == theTab.Name)
+                        {
+                            WantToSelect.Select();
+                        }
+                    }
+                }
+            }
+
         }
 
         public void updatelist()
@@ -127,7 +150,7 @@ namespace klsdamfviu
 
         private void irClient_OnTopicMessageEvent(string channel, string topic)
         {
-            newchild.scs.Text += "The topic for: " + channel + " is " + topic + "\n";
+           //newchild.scs.Text += "The topic for: " + channel + " is " + topic + "\n";
             textBox2.Text += topic; 
         }
 
@@ -140,9 +163,12 @@ namespace klsdamfviu
                 listView1.Items.Add(users[i]);
                 if (users[i].StartsWith("&"))
                 {
-                    listView1.Items[0].ImageIndex = 0;    
+                    listView1.Items[0].ImageIndex = 0;
                 }
-
+                else if (users[i].StartsWith("@"))
+                {
+                    listView1.Items[0].ImageIndex = 0;
+                }
             }
 
             toolStripStatusLabel2.Text = users.Length.ToString();
@@ -155,7 +181,7 @@ namespace klsdamfviu
         
         void irClient_OnCtcpResponseEvent(string sender, string command)
         {
-            newchild.scs.Text += sender + " " + command;
+           newchild.scs.Text += sender + " " + command;
         }
 
         private void irClient_OnQueryMessageEvent(IrcMessage m)
@@ -257,20 +283,10 @@ namespace klsdamfviu
         {
             if (e.KeyChar == (char)Keys.Return)
             {
-                if (textBox1.Text.StartsWith("//"))
-                {
-                    irClient.SendRaw("/" + textBox1.Text);
-                    newchild.scs.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
-                    textBox1.Clear();
-                    textBox1.Focus();
-                }
-                else
-                {
                     irClient.Send(tabControl1.SelectedTab.Text, textBox1.Text);
                     newchild.scs.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
                     textBox1.Clear();
                     textBox1.Focus();
-                }
             }
         }
 
@@ -297,14 +313,31 @@ namespace klsdamfviu
 
         }
 
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            updatelist();
-        }
+       
 
         private void tabControl1_MouseClick(object sender, MouseEventArgs e)
         {
-            MessageBox.Show(tabControl1.SelectedTab.Name);
+            //MessageBox.Show(tabControl1.SelectedTab.Name);
+        }
+
+        private void tabControl1_Selected(object sender, TabControlEventArgs e)
+        {
+            foreach (liteForm WantToSelect in this.MdiChildren)
+            {
+                if (tabControl1.SelectedTab != null)
+                {
+                    if (WantToSelect.Name == tabControl1.SelectedTab.Name)
+                    {
+                        WantToSelect.Select();
+                        
+                    }
+                }
+            }
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            updatelist();
         }
 
       
