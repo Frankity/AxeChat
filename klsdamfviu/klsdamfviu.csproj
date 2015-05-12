@@ -103,6 +103,10 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MotorScript\Global.cs" />
+    <Compile Include="MotorScript\InitializeEvents.cs" />
+    <Compile Include="MotorScript\JsMotorScript.cs" />
+    <Compile Include="MotorScript\ScriptEvents.cs" />
     <Compile Include="MotorScript\ScriptHandler.cs" />
     <Compile Include="MotorScript\ScriptManager.cs" />
     <Compile Include="nickForm.cs">

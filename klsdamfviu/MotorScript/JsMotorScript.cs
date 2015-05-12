@@ -11,7 +11,7 @@ using System.IO;
 
 namespace klsdamfviu.MotorScript
 {
-    class JsMotorScript : ScriptManager
+    class JsMotorScript : ScriptHandler
     {
         private readonly JintEngine engine;
         private List<PluginSource> sources = new List<PluginSource>();
@@ -38,10 +38,103 @@ namespace klsdamfviu.MotorScript
 
         public void LoadPlugin(string pluginName, string sourcefile)
         {
-            Log.Info("loading JS plugin \"{0}\"", pluginName);
+            Console.WriteLine("loading JS plugin \"{0}\"", pluginName);
             string pluginSource = File.ReadAllText(sourcefile).Replace("\r\n", "\n");
             sources.Add(new PluginSource(pluginName + " = new function() {" + pluginSource + "\n}\n", Path.GetFullPath(sourcefile)));
         }
 
+        public object Include(string path)
+        {
+            var code = File.ReadAllText("plugins/js/" + path);
+            return RunString("return new funcion() {\n" + code + "\n};");
+        }
+
+        public void SetParameter(string name, object value)
+        {
+            engine.SetParameter(name, value);
+        }
+
+        public void SetFunction(string name, Delegate function)
+        {
+            engine.SetFunction(name, function);
+        }
+
+        public object RunString(string code)
+        {
+            try
+            {
+                return engine.Run(code);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException != null ? (ex.Message + ": " + ex.InnerException.Message) : ex.Message);
+                //Log.Show();
+                return null;
+            }
+        }
+        public T CallFunction<T>(object function, params object[] arguments)
+        {
+            try
+            {
+                return function is JsFunction
+                    ? (T)engine.CallFunction((JsFunction)function, arguments)
+                    : (T)engine.CallFunction((string)function, arguments);
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
+            }
+            return default(T);
+        }
+
+        public void CallFunction(object function, params object[] arguments)
+        {
+            try
+            {
+                if (function is JsFunction)
+                    engine.CallFunction((JsFunction)function, arguments);
+                else
+                    engine.CallFunction((string)function, arguments);
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
+            }
+        }
+
+        public string ScriptsDir()
+        {
+            return "js";
+        }
+
+        public string ScriptsExt()
+        {
+            return ".js";
+        }
+
+        public string ScriptsEnt()
+        {
+            return "main";
+        }
+
+        private void WriteException(Exception exception)
+        {
+           /* var jsException = exception as JsException;
+            if (jsException != null)
+                Console.WriteLine("Script Error: " + jsException.Message + "\n(" + jsException.Value + ")");
+            else
+                Console.WriteLine("Script error: " + exception.Message + (exception.InnerException != null ? ("(" + exception.InnerException.Message + ")") : ""));
+        */
+           }
+
+        public void Run()
+        {
+            if (sources.Count == 0)
+            {
+                Console.WriteLine("Plugins not found.");
+                return;
+            }
+            sources.ForEach(s => RunString(s.Source));
+        }
     }
 }

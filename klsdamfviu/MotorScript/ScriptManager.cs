@@ -27,15 +27,15 @@ namespace klsdamfviu.MotorScript
             foreach (var scriptHandler in ScriptHandlers)
             {
                 scriptHandler.Initialize();
-                scriptHandler.SetFunction("LogInfo", (Action<object>)Log.info);
+             /*   scriptHandler.SetFunction("LogInfo", (Action<object>)Log.info);
                 scriptHandler.SetFunction("LogWarning", (Action<object>)Log.Warning);
-                scriptHandler.SetFunction("LogError", (Action<object>)Log.Error);
+                scriptHandler.SetFunction("LogError", (Action<object>)Console.WriteLine);*/
 
                 scriptHandler.SetFunction("AddHook", (Action<string, object>)AddHook);
                 scriptHandler.SetFunction("RemoveHook", (Action<string, object>)RemoveHook);
 
                 scriptHandler.SetFunction("SetGlobal", (Action<string, object>)SetGlobal);
-                scriptHandler.SetFunction("GetGlobal", (Action<string, object>)GetGlobal);
+                scriptHandler.SetFunction("GetGlobal", (Func<string, object>)GetGlobal);
 
                 string pluginsDirectory = Path.Combine("plugins", scriptHandler.ScriptsDir());
                 if (!Directory.Exists(pluginsDirectory))
@@ -66,15 +66,15 @@ namespace klsdamfviu.MotorScript
                         var dependencies = GetDependencies("plugins/" + scriptHandler.ScriptsDir() + "/" + line);
                         if (dependencies.Contains(pluginName))
                         {
-                            Log.Error("Plugin \"" + pluginName + "\" has dependency to itself!");
+                            Console.WriteLine("Plugin \"" + pluginName + "\" has dependency to itself!");
                             return;
                         }
                         if (dependencies.Contains(pluginName))
                         {
-                            Log.Error("Circular dependency detected between \"" + pluginName + "\" and \"" + line + "\"!");
+                            Console.WriteLine("Circular dependency detected between \"" + pluginName + "\" and \"" + line + "\"!");
                             return;
                         }
-                        Log.Info(pluginName + " requires " + line + ". Loading " + line + ".");
+                        Console.WriteLine(pluginName + " requires " + line + ". Loading " + line + ".");
                         LoadPlugin(PluginsDirectory + "/" + line, scriptHandler, PluginsDirectory);
                     }
                 }
@@ -82,7 +82,7 @@ namespace klsdamfviu.MotorScript
                 LoadedPlugins.Add(pluginName);
             }
             else {
-                Log.Error("Plugin \"" + pluginName + "\" could not be loaded because it does not exist!");
+                Console.WriteLine("Plugin \"" + pluginName + "\" could not be loaded because it does not exist!");
                 return;
             }
         }
@@ -113,27 +113,27 @@ namespace klsdamfviu.MotorScript
 
         private bool VerifyPlugin(string pluginName)
         {
-            if (LoadedPlugins.Contains(pluginName));
+            if (LoadedPlugins.Contains(pluginName))
             return false;
 
             if (pluginName.Contains(" "))
             {
-                Log.Error("Plugin \"" + pluginName + "\" contains spaces!");
+                Console.WriteLine("Plugin \"" + pluginName + "\" contains spaces!");
                 return false;
 	        }
             if (char.IsDigit(pluginName,0))
             {
-                Log.Error("Plugin \"" + pluginName + "\" starts with a number!");
+                Console.WriteLine("Plugin \"" + pluginName + "\" starts with a number!");
                 return false;
             }
             if (char.IsSymbol(pluginName,0))
             {
-                Log.Error("Plugin \"" + pluginName + "\" starts with a symbol!");
+                Console.WriteLine("Plugin \"" + pluginName + "\" starts with a symbol!");
                 return false;
             }
             if (char.IsWhiteSpace(pluginName,0))
             {
-                Log.Error("Plugin \"" + pluginName + "\" starts with a symbol!");
+                Console.WriteLine("Plugin \"" + pluginName + "\" starts with a symbol!");
                 return false;
             }
             return true;
@@ -154,5 +154,48 @@ namespace klsdamfviu.MotorScript
 
             return 0;
         }
+
+        public void Run()
+        {
+            foreach (var scriptHandler in ScriptHandlers)
+                scriptHandler.Run();
+        }
+
+        public void AddHook(string eventName, object function)
+        {
+            if (!Hooks.ContainsKey(eventName))
+                Hooks[eventName] = new List<object>();
+
+            if (!Hooks[eventName].Contains(function))
+                Hooks[eventName].Add(function);
+        }
+
+        public void RemoveHook(string eventName, object functionName)
+        {
+            if (Hooks.ContainsKey(eventName) && Hooks[eventName].Contains(functionName))
+                Hooks[eventName].Remove(functionName);
+        }
+
+       public ScriptEvents CallEvent(string name, ScriptEvents args)
+        {
+         if (Global.PrintEvents)
+            {
+                if (name.ToLower().Contains("update") && Global.PrintEventUpdates)
+                    Console.WriteLine("Event Called: " + name, "omg");
+                else if (!name.ToLower().Contains("update"))
+                    Console.WriteLine("Event Called: " + name, "omg");
+            }
+            if (!Hooks.ContainsKey(name))
+	        {
+		        args.Canceled = false;
+                return args;
+        	}
+            return args;
+        }
+
+       public T CallEvent<T>(string name, ScriptEvents args) where T : ScriptEvents
+       {
+           return (T)CallEvent(name, args);
+       }
     }
 }

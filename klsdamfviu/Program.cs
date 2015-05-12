@@ -1,12 +1,4 @@
-﻿/*
- * Creado por SharpDevelop.
- * Usuario: Sistemas KOBALTO
- * Fecha: 23/04/2015
- * Hora: 08:47 a.m.
- * 
- * Para cambiar esta plantilla use Herramientas | Opciones | Codificación | Editar Encabezados Estándar
- */
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace klsdamfviu

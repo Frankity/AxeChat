@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Security.AccessControl;
 using System.Collections.Generic;
+using klsdamfviu.MotorScript;
+using System.Reflection;
+using System.Runtime.Hosting;
 using System.Windows.Forms;
 using System.Threading;
 using System.Drawing;
 using System.Xml;
 using IrcLib;
-
+using Jint;
+using System.IO;
 
 namespace klsdamfviu
 {
@@ -20,8 +24,22 @@ namespace klsdamfviu
         xmlDocs xl = new xmlDocs();
         liteForm newchild = new liteForm();
 
+        //----------------------plugins-----------------------//
+
+        public static ScriptHandler Scripting;
+        public static ScriptManager ScrMngr;
+
         public MainForm()
         {
+            Scripting = new JsMotorScript();
+            ScrMngr = new ScriptManager();
+            ScrMngr.ScriptHandlers.Add(Scripting);
+            ScrMngr.Initialize();
+
+            Scripting.Run();
+
+            var iniArgs = ScrMngr.CallEvent<InitializeEvents>("OnInitialize", new InitializeEvents());
+
             IsMdiContainer = true;
             //L.Listen();
             InitializeComponent();
@@ -32,8 +50,6 @@ namespace klsdamfviu
         }
         void MainFormLoad(object sender, EventArgs e)
         {
-            Console.WriteLine("working");
-
             irClient = new IrcBot(xl.MainNick);
             irClient.OnConnectEvent += irc_OnConnectEvent;
             irClient.OnMotdEvent += irc_OnMotEvent;
@@ -283,6 +299,7 @@ namespace klsdamfviu
         {
             if (e.KeyChar == (char)Keys.Return)
             {
+                Console.WriteLine(textBox1.Text);
                     irClient.Send(tabControl1.SelectedTab.Text, textBox1.Text);
                     newchild.scs.Text += this.button2.Text + ": " + textBox1.Text + "\r\n";
                     textBox1.Clear();
@@ -339,8 +356,5 @@ namespace klsdamfviu
         {
             updatelist();
         }
-
-      
-
     }
 }
