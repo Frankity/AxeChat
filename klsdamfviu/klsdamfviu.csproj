@@ -60,12 +60,13 @@
     <Reference Include="ICSharpCode.TextEditor">
       <HintPath>..\..\..\..\..\..\Program Files\SharpDevelop\3.0\bin\ICSharpCode.TextEditor.dll</HintPath>
     </Reference>
+    <Reference Include="IPlugin, Version=1.0.5610.32786, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\IPlugin.dll</HintPath>
+    </Reference>
     <Reference Include="IrcLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\dev\ircLib-master\ircLib\bin\Debug\IrcLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Jint">
-      <HintPath>D:\Coob-master\Coob-master\Coob\Jint.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -103,13 +104,8 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MotorScript\ConnectionEvents.cs" />
-    <Compile Include="MotorScript\Global.cs" />
-    <Compile Include="MotorScript\InitializeEvents.cs" />
-    <Compile Include="MotorScript\JsMotorScript.cs" />
-    <Compile Include="MotorScript\ScriptEvents.cs" />
-    <Compile Include="MotorScript\ScriptHandler.cs" />
-    <Compile Include="MotorScript\ScriptManager.cs" />
+    <Compile Include="MotorScript\GenericLoadPlugin.cs" />
+    <Compile Include="MotorScript\LoadPlugin.cs" />
     <Compile Include="nickForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -157,5 +153,6 @@
   <ItemGroup>
     <Content Include="1431117954_Hatchet.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

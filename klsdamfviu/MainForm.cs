@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.AccessControl;
 using System.Collections.Generic;
-using klsdamfviu.MotorScript;
 using System.Reflection;
 using System.Runtime.Hosting;
 using System.Windows.Forms;
@@ -9,8 +8,8 @@ using System.Threading;
 using System.Drawing;
 using System.Xml;
 using IrcLib;
-using Jint;
 using System.IO;
+using klsdamfviu.MotorScript;
 
 namespace klsdamfviu
 {
@@ -25,9 +24,10 @@ namespace klsdamfviu
         xmlDocs xl = new xmlDocs();
         liteForm newchild = new liteForm();
 
-        //----------------------plugins-----------------------//
-       
+        Dictionary<string, IPlugin.IPlugin> _Plugins;
 
+        //----------------------plugins-----------------------//
+                
         public MainForm()
         {
             
@@ -38,6 +38,14 @@ namespace klsdamfviu
             xl.loadXMl(AppDomain.CurrentDomain.BaseDirectory + @"\config.xml");
             //  MessageBox.Show(xl.LastChan);
 
+            _Plugins = new Dictionary<string, IPlugin.IPlugin>();
+            ICollection<IPlugin.IPlugin> plugins = GenericLoadPlugin<IPlugin.IPlugin>.LoladPlugins("plugins");
+            foreach (var item in plugins)
+            {
+                _Plugins.Add(item.Name, item);
+                item.Do();
+            }
+            
         }
         void MainFormLoad(object sender, EventArgs e)
         {
@@ -66,7 +74,6 @@ namespace klsdamfviu
             }
             List<string> ch = new List<string>();
             ch.Add(xl.LastChan);
-          
 
           irClient.Connect(xl.Server, 6660,true,ch);
         }
